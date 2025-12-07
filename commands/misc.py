@@ -108,6 +108,30 @@ class Misc(commands.Cog):
 
         await interaction.followup.send(f"**Ergebnis:**\n```\n{output}\n```")
 
+    # --------------------------
+    # PURGE COMMAND
+    # --------------------------
+    @app_commands.command(name="purge", description="Löscht eine bestimmte Anzahl der letzten Nachrichten im Kanal")
+    @app_commands.describe(amount="Anzahl der Nachrichten, die gelöscht werden sollen")
+    async def purge_cmd(self, interaction: discord.Interaction, amount: int):
+        if "ServerAdmin" not in [role.name for role in interaction.user.roles]:
+            return await interaction.response.send_message("Du hast keine Berechtigung! 🔐", ephemeral=True)
+
+        if amount < 1:
+            return await interaction.response.send_message("Bitte eine positive Zahl angeben.", ephemeral=True)
+        if amount > 100:
+            return await interaction.response.send_message("Maximal 100 Nachrichten auf einmal.", ephemeral=True)
+
+        # 1. Sofortige Antwort senden
+        await interaction.response.send_message(f"Lösche {amount} Nachrichten…", ephemeral=True)
+
+        # 2. Nachrichten löschen (ohne die Command-Nachricht)
+        deleted = await interaction.channel.purge(limit=amount + 1, check=lambda m: m.id != interaction.id)
+
+        # 3. Bestätigung senden
+        await interaction.followup.send(f"Es wurden {len(deleted)} Nachrichten gelöscht.", ephemeral=True)
+
+
 # ======================================================
 # SETUP
 # ======================================================
@@ -117,3 +141,4 @@ async def setup(bot: commands.Bot):
     # Explicitly add commands to guild tree
     bot.tree.add_command(cog.server_cmd, guild=bot.guild)
     bot.tree.add_command(cog.docker_cmd, guild=bot.guild)
+    bot.tree.add_command(cog.purge_cmd, guild=bot.guild)
