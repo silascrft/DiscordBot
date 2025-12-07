@@ -16,7 +16,7 @@ GUILD_ID = int(os.getenv("GUILD_ID"))
 class Client(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=commands.when_mentioned_or('.'), intents=discord.Intents().all())
-        self.coglist = ["commands.AutoShutdown", "commands.fun", "commands.wake","commands.RandomEvents", "commands.whitelist", "commands.misc", "commands.McStats", "commands.infos", "commands.chat_mirror", "commands.backup"]
+        self.coglist = ["commands.RoleReaction", "commands.AutoShutdown", "commands.fun", "commands.wake","commands.RandomEvents", "commands.whitelist", "commands.misc", "commands.McStats", "commands.infos", "commands.chat_mirror", "commands.backup"]
         self.guild = discord.Object(id=GUILD_ID)
 
     async def setup_hook(self):
