@@ -10,22 +10,39 @@ class Infos(commands.Cog):
     # --------------------------
     # /map
     # --------------------------
+    # @app_commands.command(name="map", description="Öffnet die Minecraft Dynmap.")
+    # async def map_cmd(self, interaction: discord.Interaction):
+
+    #     button = discord.ui.Button(
+    #         label="🗺️ Karte Öffnen",
+    #         url="http://mc.Murmelbahn1337.de:8100/",
+    #         style=discord.ButtonStyle.link
+    #     )
+
+    #     view = discord.ui.View()
+    #     view.add_item(button)
+
+    #     await interaction.response.send_message(
+    #         "Hier ist die Kegelbahn Minecraft Map 🌍",
+    #         view=view
+    #     )
+
+     # --------------------------
+    # /modrinth
+    # --------------------------
     @app_commands.command(name="map", description="Öffnet die Minecraft Dynmap.")
     async def map_cmd(self, interaction: discord.Interaction):
 
-        button = discord.ui.Button(
-            label="🗺️ Karte Öffnen",
-            url="http://mc.Murmelbahn1337.de:8100/",
-            style=discord.ButtonStyle.link
+        embed = discord.Embed(
+            title="🌍 Kegelbahn Minecraft Map 🌍",
+            description="[🗺️ Karte Öffnen 🗺️](http://mc.Murmelbahn1337.de:8100/)",
+            color=discord.Color.green()
         )
+        embed.set_footer(text="Bereitgestellt vom Copper Golem")
 
-        view = discord.ui.View()
-        view.add_item(button)
+        await interaction.response.send_message(embed=embed)
 
-        await interaction.response.send_message(
-            "Hier ist die Kegelbahn Minecraft Map 🌍",
-            view=view
-        )
+
 
     # --------------------------
     # /modrinth
@@ -34,8 +51,8 @@ class Infos(commands.Cog):
     async def modrinth_cmd(self, interaction: discord.Interaction):
 
         embed = discord.Embed(
-            title="Modrinth Modpack 📦",
-            description="[Modpack Download](https://modrinth.com)",
+            title="📦 Modrinth Modpack 📦",
+            description="[📦 Modpack Download 📦](https://modrinth.com)",
             color=discord.Color.green()
         )
         embed.set_footer(text="Bereitgestellt vom Copper Golem")
@@ -49,7 +66,7 @@ class Infos(commands.Cog):
     async def ip_cmd(self, interaction: discord.Interaction):
 
         embed = discord.Embed(
-            title="MURMELBAHN SERVER IP 🌐",
+            title="🌐 MURMELBAHN SERVER IP 🌐",
             description="**`mc.Murmelbahn1337.de`**",
             color=discord.Color.green()
         )
