@@ -127,31 +127,31 @@ class MCStats(commands.Cog):
             ]
             total_distance_cm = sum(custom.get(f"minecraft:{k}", 0) for k in distance_keys)
             distance_km = round(total_distance_cm / 100000, 2)
-            embed.add_field(name="Distance Traveled", value=f"{distance_km:,} km", inline=True)
+            embed.add_field(name="Distance Traveled", value=f"{distance_km:,} km  ✈️", inline=True)
 
             mined = stats.get("minecraft:mined", {})
-            embed.add_field(name="Blocks Broken", value=f"{sum(mined.values()):,}", inline=True)
+            embed.add_field(name="Blocks Broken", value=f"{sum(mined.values()):,} ⛏️", inline=True)
 
             used = stats.get("minecraft:used", {})
-            embed.add_field(name="Blocks Placed", value=f"{sum(used.values()):,}", inline=True)
+            embed.add_field(name="Blocks Placed", value=f"{sum(used.values()):,} 🦺", inline=True)
 
             # Damage
             def round_half(x): return round(x*2)/2
             damage_done = round_half(custom.get("minecraft:damage_dealt", 0)/20)
             damage_taken = round_half(custom.get("minecraft:damage_taken", 0)/20)
 
-            embed.add_field(name="Damage Done", value=f"{damage_done:.1f} ❤", inline=True)
-            embed.add_field(name="Damage Taken", value=f"{damage_taken:.1f} ❤", inline=True)
+            embed.add_field(name="Damage Done", value=f"{damage_done:.1f} 🗡️", inline=True)
+            embed.add_field(name="Damage Taken", value=f"{damage_taken:.1f} 💔", inline=True)
 
-            embed.add_field(name="Deaths", value=f"{custom.get('minecraft:deaths', 0):,}", inline=True)
-            embed.add_field(name="Player Kills", value=f"{custom.get('minecraft:player_kills', 0):,}", inline=True)
+            embed.add_field(name="Deaths", value=f"{custom.get('minecraft:deaths', 0):,}🪦", inline=True)
+            embed.add_field(name="Player Kills", value=f"{custom.get('minecraft:player_kills', 0):,} ⚔️", inline=True)
 
             killed = stats.get("minecraft:killed", {})
             entity_kills = sum(v for k, v in killed.items() if k != "minecraft:player")
             embed.add_field(name="Entity Kills", value=f"{entity_kills:,}", inline=True)
 
             playtime_hours = round(custom.get("minecraft:play_time", 0)/20/60/60, 2)
-            embed.add_field(name="Playtime", value=f"{playtime_hours:,} h", inline=True)
+            embed.add_field(name="Playtime", value=f"{playtime_hours:,} h ⌛", inline=True)
 
             await interaction.followup.send(embed=embed)
 
@@ -163,26 +163,25 @@ class MCStats(commands.Cog):
     @app_commands.describe(number="Anzahl der Spieler", stat_type="Statistiktyp")
     @app_commands.choices(
         stat_type=[app_commands.Choice(name=s.replace("_", " ").title(), value=s) 
-                   for s in [
-                       "distance_traveled", "block_broken", "block_placed",
-                       "damage_done", "damage_taken", "deaths", "player_kills",
-                       "entity_kills", "playtime"
-                   ]]
+                for s in [
+                    "distance_traveled", "block_broken", "block_placed",
+                    "damage_done", "damage_taken", "deaths", "player_kills",
+                    "entity_kills", "playtime"
+                ]]
     )
     async def top(self, interaction: discord.Interaction, number: int, stat_type: app_commands.Choice[str]):
         await interaction.response.defer()
         try:
             stat_type_lower = stat_type.value
 
-            # List files over SSH
+            # Liste der Dateien über SSH
             cmd = (
-            f"ssh -o BatchMode=yes -T -n "
-            f"-o StrictHostKeyChecking=no "
-            f"-o UserKnownHostsFile=/dev/null "
-            f"{self.MC_SSH_USER}@{self.MC_HOST} ls {shlex.quote(self.STATS_PATH)}"
+                f"ssh -o BatchMode=yes -T -n "
+                f"-o StrictHostKeyChecking=no "
+                f"-o UserKnownHostsFile=/dev/null "
+                f"{self.MC_SSH_USER}@{self.MC_HOST} ls {shlex.quote(self.STATS_PATH)}"
             )
-            
-            print(f"[DEBUG SSH] Listing files: {cmd}")  # optional debug
+
             proc = await asyncio.create_subprocess_shell(
                 cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
             )
@@ -198,7 +197,6 @@ class MCStats(commands.Cog):
                     print(f"[SSH ERROR] {err}")
 
             await proc.wait()
-
             files = [f for f in files if f.endswith(".json")]
 
             users = await self.ssh_cat_json(self.USERCACHE_PATH)
@@ -251,12 +249,24 @@ class MCStats(commands.Cog):
 
             top_players = sorted(player_stats, key=lambda x: x[1], reverse=True)[:number]
 
-            msg = f"Top {number} Spieler für {stat_type_lower.replace('_', ' ').title()}:\n"
+            # Emojis nur hinter die Überschrift
+            emoji_map = {
+                "distance_traveled": "✈️",
+                "block_broken": "⛏️",
+                "block_placed": "🦺",
+                "damage_done": "🗡️",
+                "damage_taken": "💔",
+                "deaths": "🪦",
+                "player_kills": "⚔️",
+                "entity_kills": "👾",
+                "playtime": "⌛"
+            }
+            title_emoji = emoji_map.get(stat_type_lower, "")
+            msg = f"Top {number} Spieler für {stat_type_lower.replace('_', ' ').title()} {title_emoji}\n"
+
             for i, p in enumerate(top_players):
                 if stat_type_lower == "distance_traveled":
                     msg += f"{i+1}. {p[0]} — {p[1]:,.2f} km\n"
-                elif stat_type_lower in ["damage_done", "damage_taken"]:
-                    msg += f"{i+1}. {p[0]} — {p[1]} ❤\n"
                 elif stat_type_lower == "playtime":
                     msg += f"{i+1}. {p[0]} — {p[1]:,.2f} h\n"
                 else:
@@ -266,6 +276,7 @@ class MCStats(commands.Cog):
 
         except Exception as e:
             await interaction.followup.send(f"Fehler beim Abrufen der Top Stats: `{e}`")
+
 
 
 # ------------------------- Cog Setup -------------------------

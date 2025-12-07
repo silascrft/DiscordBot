@@ -28,9 +28,9 @@ class Whitelist(commands.Cog):
         try:
             with MCRcon(RCON_HOST, RCON_PASSWORD, port=RCON_PORT) as mcr:
                 resp = mcr.command(command)
-                return resp.strip() if resp else "✔ Command executed successfully."
+                return resp.strip() if resp else "Command erfolgreich ausgeführt. ✔️"
         except Exception as e:
-            return f"❌ Error: {e}"
+            return f"Error: {e} ❌"
 
     # --------------------------
     # Slash-Command /whitelist
@@ -56,13 +56,13 @@ class Whitelist(commands.Cog):
 
         if action.value == "add" and "mcPlayer" not in role_names:
             return await interaction.response.send_message(
-                "❌ Du benötigst die Rolle **mcPlayer**, um Spieler hinzuzufügen.",
+                "Du benötigst die Rolle **mcPlayer**, um Spieler hinzuzufügen. ❌",
                 ephemeral=True
             )
 
         if action.value == "remove" and "mcAdmin" not in role_names:
             return await interaction.response.send_message(
-                "❌ Nur **mcAdmin** darf Spieler entfernen.",
+                "Nur **mcAdmin** darf Spieler entfernen. ❌",
                 ephemeral=True
             )
 
@@ -74,16 +74,16 @@ class Whitelist(commands.Cog):
         clean_result = result.lower()
 
         if "already whitelisted" in clean_result:
-            return await interaction.followup.send(f"`{name}` is already whitelisted ✔")
+            return await interaction.followup.send(f"`{name}` ist schon gewhitelistet ✅")
 
         if "not whitelisted" in clean_result:
             return await interaction.followup.send(f"`{name}` is not on the whitelist ❌")
 
         if action.value == "add" and ("added" in clean_result or "whitelisted" in clean_result):
-            return await interaction.followup.send(f"Added `{name}` to the whitelist! ✨")
+            return await interaction.followup.send(f"`{name}` wurde erfolgreich gewhitelistet! ✨")
 
         if action.value == "remove" and ("removed" in clean_result):
-            return await interaction.followup.send(f"Removed `{name}` from the whitelist! ✔")
+            return await interaction.followup.send(f"`{name}` wurde von der Whitelist entfernt🗿")
 
         await interaction.followup.send(result)
 

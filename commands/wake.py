@@ -23,11 +23,11 @@ class Wake(commands.Cog):
         await interaction.response.defer(ephemeral=False)
 
         if is_server_online():
-            return await interaction.followup.send("🟢 Der Server läuft bereits!")
+            return await interaction.followup.send("Der Server läuft bereits! 🟢")
 
         result = power_on_server()
 
-        await interaction.followup.send(f"⚡ {result}")
+        await interaction.followup.send(f"{result}")
 
     # async def cog_load(self):
     #     # Automatisch alle App-Commands des Cogs zur Guild hinzufügen

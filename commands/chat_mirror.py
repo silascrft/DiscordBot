@@ -5,6 +5,9 @@ import asyncio
 import re
 from mcrcon import MCRcon
 import shlex
+from colorama import Back, Fore, Style
+import time
+
 
 class ChatMirror(commands.Cog):
     def __init__(self, bot):
@@ -23,14 +26,17 @@ class ChatMirror(commands.Cog):
 
     # ================= Minecraft ? Discord =================
     async def stream_minecraft_log(self):
+        prfx = (Back.BLACK + Fore.GREEN + time.strftime("%H:%M:%S", time.gmtime()) + Back.RESET + Fore.WHITE + Style.BRIGHT)
+
         await self.bot.wait_until_ready()
         channel = self.bot.get_channel(self.DISCORD_CHANNEL_ID)
         if not channel:
             print("[DEBUG] Discord Channel nicht gefunden")
             return
 
-        ssh_command = f"ssh {self.MC_SSH_USER}@{self.MC_HOST} tail -F {shlex.quote(self.LOG_FILE)}"
-        print(f"[DEBUG] Starte Subprocess: {ssh_command}")
+        ssh_command = f"ssh {self.MC_SSH_USER}@{self.MC_HOST} tail -n 0 -F {shlex.quote(self.LOG_FILE)}"
+        #print(f"[Starte Subprocess: {ssh_command}")
+        print(prfx + " Starte Subprocess für Chat-Mirror " + Fore.YELLOW + ssh_command)
 
         proc = await asyncio.create_subprocess_shell(
             ssh_command,
@@ -69,7 +75,7 @@ class ChatMirror(commands.Cog):
 
             if any(re.search(pat, line) for pat in death_patterns):
                 cleaned = re.sub(r".*INFO\]: ", "", line)
-                await channel.send(f"**Death:** {cleaned}")
+                await channel.send(f"☠️ **Death:** {cleaned}")
                 continue
 
             # ================= Optional: Kicks / Disconnects =================
@@ -83,14 +89,14 @@ class ChatMirror(commands.Cog):
             join_match = re.search(r": ([A-Za-z0-9_]+) joined the game", line)
             if join_match:
                 player = join_match.group(1)
-                await channel.send(f"ðŸŸ¢ **Join:** `{player}` hat den Server betreten.")
+                await channel.send(f"🟩 **Join:** `{player}` hat den Server betreten.")
                 continue
 
             # ================= Player Leave =================
             leave_match = re.search(r": ([A-Za-z0-9_]+) left the game", line)
             if leave_match:
                 player = leave_match.group(1)
-                await channel.send(f"ðŸ”´ **Leave:** `{player}` hat den Server verlassen.")
+                await channel.send(f"🟥 **Leave:** `{player}` hat den Server verlassen.")
                 continue
 
             # ================= Lost Connection / Disconnect =================

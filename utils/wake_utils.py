@@ -9,7 +9,7 @@ try:
 except ImportError:
     IS_PI = False
     prfx = Back.BLACK + Fore.GREEN + time.strftime("%H:%M:%S", time.gmtime()) + Back.RESET + Fore.WHITE + Style.BRIGHT
-    print(prfx + Fore.YELLOW + " ⚠ RPi.GPIO nicht gefunden – GPIO wird deaktiviert (du bist nicht auf einem Raspberry Pi)." + Fore.WHITE)
+    print(prfx + Fore.YELLOW + " ⚠️  RPi.GPIO nicht gefunden ⚠️  GPIO wird deaktiviert (du bist nicht auf einem Raspberry Pi)." + Fore.WHITE)
 
 import time
 
@@ -24,8 +24,8 @@ def power_on_server():
     """Simuliert oder aktiviert den Power-Pin auf einem Raspberry Pi."""
 
     if not IS_PI:
-        _log(" ⚠ GPIO-Funktion übersprungen (nicht auf Raspberry Pi).")
-        return "GPIO nicht verfügbar – Testmodus aktiv."
+        _log(" ⚠️ GPIO-Funktion übersprungen ⚠️ (nicht auf Raspberry Pi).")
+        return " ⚠️ GPIO nicht verfügbar – Testmodus aktiv. ⚠️"
 
     try:
         GPIO.setmode(GPIO.BCM)
@@ -38,11 +38,11 @@ def power_on_server():
 
         GPIO.cleanup()
 
-        _log(" ✅ Server wurde über GPIO eingeschaltet.")
+        _log("Server wurde über GPIO eingeschaltet. ✅")
         return "Server wurde über GPIO eingeschaltet."
 
     except Exception as e:
-        _log(f"❌ GPIO Fehler: {e}")
+        _log(f"GPIO Fehler: ❌ {e}")
         return f"GPIO Fehler: {e}"
 
 
@@ -62,5 +62,5 @@ def is_server_online():
         return online
 
     except Exception as e:
-        _log(f"❌ Fehler beim Prüfen des Servers: {e}")
+        _log(f"Fehler beim Prüfen des Servers: ❌ {e}")
         return False

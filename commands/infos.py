@@ -10,11 +10,11 @@ class Infos(commands.Cog):
     # --------------------------
     # /map
     # --------------------------
-    @app_commands.command(name="map", description="Ã–ffnet die Minecraft Dynmap.")
+    @app_commands.command(name="map", description="Öffnet die Minecraft Dynmap.")
     async def map_cmd(self, interaction: discord.Interaction):
 
         button = discord.ui.Button(
-            label="ðŸ—ºï¸ Karte Ã¶ffnen",
+            label="🗺️ Karte Öffnen",
             url="http://mc.Murmelbahn1337.de:8100/",
             style=discord.ButtonStyle.link
         )
@@ -23,7 +23,7 @@ class Infos(commands.Cog):
         view.add_item(button)
 
         await interaction.response.send_message(
-            "Hier ist die Kegelbahn Minecraft Map:",
+            "Hier ist die Kegelbahn Minecraft Map 🌍",
             view=view
         )
 
@@ -34,8 +34,8 @@ class Infos(commands.Cog):
     async def modrinth_cmd(self, interaction: discord.Interaction):
 
         embed = discord.Embed(
-            title="Modrinth Modpack",
-            description="[Modpack Download ðŸ“¦](https://modrinth.com)",
+            title="Modrinth Modpack 📦",
+            description="[Modpack Download](https://modrinth.com)",
             color=discord.Color.green()
         )
         embed.set_footer(text="Bereitgestellt vom Copper Golem")
@@ -45,11 +45,11 @@ class Infos(commands.Cog):
     # --------------------------
     # /ip
     # --------------------------
-    @app_commands.command(name="ip", description="Zeigt die Murmelbahn Server IP.")
+    @app_commands.command(name="ip", description="Zeigt die Murmelbahn Server IP")
     async def ip_cmd(self, interaction: discord.Interaction):
 
         embed = discord.Embed(
-            title="ðŸ“¡  MURMELBAHN SERVER IP",
+            title="MURMELBAHN SERVER IP 🌐",
             description="**`mc.Murmelbahn1337.de`**",
             color=discord.Color.green()
         )
@@ -60,16 +60,16 @@ class Infos(commands.Cog):
     # --------------------------
     # /help
     # --------------------------
-    @app_commands.command(name="help", description="Zeigt alle verfÃ¼gbaren Commands.")
+    @app_commands.command(name="help", description="Zeigt alle verfügbaren Commands.")
     async def help_cmd(self, interaction: discord.Interaction):
 
         embed = discord.Embed(
-            title="ðŸ“˜ VerfÃ¼gbare Commands",
+            title="Verfügbare Commands 📜",
             color=discord.Color.blurple()
         )
 
         embed.add_field(
-            name="ðŸ› ï¸ Server",
+            name="🖥️ Server",
             value=(
                 "`/wake`\n"
                 "`/backup`\n"
@@ -80,25 +80,13 @@ class Infos(commands.Cog):
         )
 
         embed.add_field(
-            name="ðŸ‘¤ Whitelist",
+            name="👤 Whitelist",
             value="`/whitelist add <NAME>`",
             inline=True
         )
 
         embed.add_field(
-            name="ðŸ“Š Statistiken",
-            value=(
-                "`/stats <NAME>`\n"
-                "`/top <NUM> <STAT_TYPE>`\n\n"
-                "**STAT_TYPE:** distance_traveled, block_broken, block_placed,\n"
-                "damage_done, damage_taken, deaths,\n"
-                "player_kills, entity_kills, playtime"
-            ),
-            inline=False
-        )
-
-        embed.add_field(
-            name="ðŸ”— Links",
+            name="🔗 Links",
             value="`/modrinth`\n`/map`",
             inline=False
         )

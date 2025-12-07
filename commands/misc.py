@@ -34,7 +34,7 @@ async def run_ssh(command: str) -> str:
             return result.stdout
     except (asyncssh.Error, OSError) as e:
         logger.error(f"SSH error '{command}': {e}")
-        return f"Error executing command: {e}"
+        return f"Fehler beim Ausführen des Commands: {e} ❌"
 
 # ======================================================
 # MAIN COG
@@ -56,16 +56,16 @@ class Misc(commands.Cog):
         required_role = MISC_ROLES["Server"]
         if required_role not in [role.name for role in interaction.user.roles]:
             return await interaction.response.send_message(
-                f"❌ Du benötigst die Rolle **{required_role}**!", ephemeral=True
+                f"Du benötigst die Rolle **{required_role}**! 🔐", ephemeral=True
             )
 
         await interaction.response.defer()
 
         if action.value == "shutdown":
-            await interaction.followup.send("🔻 Fahre Server herunter…")
+            await interaction.followup.send("Fahre Server herunter… 🔻")
             output = await run_ssh("sudo shutdown -h now")
         else:
-            await interaction.followup.send("🔄 Starte Server neu…")
+            await interaction.followup.send("Starte Server neu… 🔄")
             output = await run_ssh("sudo reboot")
 
         await interaction.followup.send(f"**Ergebnis:**\n```\n{output}\n```")
@@ -94,16 +94,16 @@ class Misc(commands.Cog):
         required_role = MISC_ROLES["Docker"]
         if required_role not in [role.name for role in interaction.user.roles]:
             return await interaction.response.send_message(
-                f"❌ Du benötigst die Rolle **{required_role}**!", ephemeral=True
+                f"Du benötigst die Rolle **{required_role}**! 🔐", ephemeral=True
             )
 
         await interaction.response.defer()
 
         if action.value == "start":
-            await interaction.followup.send(f"▶ Starte Container **{container.value}**…")
-            output = await run_ssh(f"docker start {container.value}")
+            await interaction.followup.send(f"Starte Container **{container.value}**… ⬆️")
+            output = await run_ssh(f"Starte Container **{container.value}**… ▶")
         else:
-            await interaction.followup.send(f"⏹ Stoppe Container **{container.value}**…")
+            await interaction.followup.send(f"Stoppe Container **{container.value}**… ⏹️")
             output = await run_ssh(f"docker stop {container.value}")
 
         await interaction.followup.send(f"**Ergebnis:**\n```\n{output}\n```")

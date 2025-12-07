@@ -17,13 +17,13 @@ class RandomEvents(commands.Cog):
         # AntwortmÃ¶glichkeiten + Wahrscheinlichkeiten
         self.responses = {
             "top_or_bottom": [
-                ("top", 0.45),
-                ("bottom", 0.45),
-                ("both", 0.10),
+                ("Top 🔼", 0.45),
+                ("Bottom 🔽", 0.45),
+                ("Both ♾️", 0.10),
             ],
-            "kopf_oder_zahl": [
-                ("Kopf", 0.50),
-                ("Zahl", 0.50),
+            "coinflip": [
+                ("Kopf 🪙", 0.50),
+                ("Zahl 🪙", 0.50),
             ],
         }
 
@@ -44,18 +44,18 @@ class RandomEvents(commands.Cog):
     )
     async def top_or_bottom_cmd(self, interaction: discord.Interaction):
         result = self.get_weighted_random(self.responses["top_or_bottom"])
-        await interaction.response.send_message(f"ðŸŽ² Ergebnis: **{result}**")
+        await interaction.response.send_message(f"🎲 **Ergebnis:** {result}")
 
     # ================================
     # /kopf_oder_zahl
     # ================================
     @app_commands.command(
-        name="kopf_oder_zahl",
+        name="coinflip",
         description="Wirft eine MÃ¼nze"
     )
-    async def kopf_oder_zahl_cmd(self, interaction: discord.Interaction):
-        result = self.get_weighted_random(self.responses["kopf_oder_zahl"])
-        await interaction.response.send_message(f"ðŸª™ Ergebnis: **{result}**")
+    async def Coinflip(self, interaction: discord.Interaction):
+        result = self.get_weighted_random(self.responses["coinflip"])
+        await interaction.response.send_message(f"🪙 **Münzwurf:** {result}")
 
 
     # --------------------------
@@ -71,10 +71,15 @@ class RandomEvents(commands.Cog):
 # --------------------------
 # Setup
 # --------------------------
-async def setup(bot: commands.Bot) -> None:
-    await bot.add_cog(RandomEvents(bot))
+#async def setup(bot: commands.Bot) -> None:
+#    await bot.add_cog(RandomEvents(bot))
 
 
 
-
+async def setup(bot: commands.Bot):
+    cog = RandomEvents(bot)
+    await bot.add_cog(cog)
+    # Explicitly add commands to guild tree
+    bot.tree.add_command(cog.top_or_bottom_cmd, guild=bot.guild)
+    bot.tree.add_command(cog.Coinflip, guild=bot.guild)
 

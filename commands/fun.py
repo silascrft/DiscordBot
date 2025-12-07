@@ -23,3 +23,11 @@ class Fun(commands.Cog):
 
 async def setup(client: commands.Bot) -> None:
     await client.add_cog(Fun(client))
+
+
+async def setup(bot: commands.Bot):
+    cog = Fun(bot)
+    await bot.add_cog(cog)
+    # Explicitly add commands to guild tree
+    bot.tree.add_command(cog.hello, guild=bot.guild)
+    bot.tree.add_command(cog.printer, guild=bot.guild)
