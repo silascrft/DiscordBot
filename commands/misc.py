@@ -6,6 +6,7 @@ import asyncssh
 import os
 from dotenv import load_dotenv
 import logging
+from utils.wake_utils import power_on_server, is_server_online
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -49,26 +50,45 @@ class Misc(commands.Cog):
     @app_commands.command(name="server", description="Server starten/stoppen")
     @app_commands.describe(action="Was soll passieren?")
     @app_commands.choices(action=[
+        app_commands.Choice(name="Start", value="start"),
         app_commands.Choice(name="Shutdown", value="shutdown"),
         app_commands.Choice(name="Restart", value="restart")
     ])
     async def server_cmd(self, interaction: discord.Interaction, action: app_commands.Choice[str]):
-        required_role = MISC_ROLES["Server"]
-        if required_role not in [role.name for role in interaction.user.roles]:
+        # Rollen pro Aktion
+        ROLE_MAPPING = {
+            "start": os.getenv("ROLE_SERVER_START", "ServerStart"),
+            "shutdown": os.getenv("ROLE_SERVER_SHUTDOWN", "ServerShutdown"),
+            "restart": os.getenv("ROLE_SERVER_RESTART", "ServerRestart"),
+        }
+
+        required_role = ROLE_MAPPING.get(action.value)
+        user_roles = [role.name for role in interaction.user.roles]
+
+        if required_role not in user_roles:
             return await interaction.response.send_message(
                 f"Du benötigst die Rolle **{required_role}**! 🔐", ephemeral=True
             )
 
         await interaction.response.defer()
 
-        if action.value == "shutdown":
+        if action.value == "start":
+            if is_server_online():
+                return await interaction.followup.send("Der Server läuft bereits! 🟢")
+
+            result = power_on_server()
+            await interaction.followup.send(f"{result}")
+
+        elif action.value == "shutdown":
             await interaction.followup.send("Fahre Server herunter… 🔻")
             output = await run_ssh("sudo shutdown -h now")
-        else:
+            await interaction.followup.send(f"**Ergebnis:**\n```\n{output}\n```")
+
+        elif action.value == "restart":
             await interaction.followup.send("Starte Server neu… 🔄")
             output = await run_ssh("sudo reboot")
+            await interaction.followup.send(f"**Ergebnis:**\n```\n{output}\n```")
 
-        await interaction.followup.send(f"**Ergebnis:**\n```\n{output}\n```")
 
     # --------------------------
     # DOCKER COMMAND

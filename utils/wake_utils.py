@@ -29,12 +29,12 @@ def power_on_server():
 
     try:
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(18, GPIO.OUT)
+        GPIO.setup(17, GPIO.OUT)
 
         # Power-Pin 1 Sekunde triggern
-        GPIO.output(18, GPIO.HIGH)
+        GPIO.output(17, GPIO.HIGH)
         time.sleep(1)
-        GPIO.output(18, GPIO.LOW)
+        GPIO.output(17, GPIO.LOW)
 
         GPIO.cleanup()
 
