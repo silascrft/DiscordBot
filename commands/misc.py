@@ -7,6 +7,7 @@ import os
 from dotenv import load_dotenv
 import logging
 from utils.wake_utils import power_on_server, is_server_online
+import subprocess
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -152,6 +153,63 @@ class Misc(commands.Cog):
         await interaction.followup.send(f"Es wurden {len(deleted)} Nachrichten gelöscht.", ephemeral=True)
 
 
+
+    # --------------------------
+    # DISCORD BOT SERVICE COMMAND
+    # --------------------------
+    @app_commands.command(name="dcbot", description="Discord-Bot Service auf dem Pi steuern")
+    @app_commands.describe(action="Was soll passieren?")
+    @app_commands.choices(action=[
+        app_commands.Choice(name="Start", value="start"),
+        app_commands.Choice(name="Stop", value="stop"),
+        app_commands.Choice(name="Restart", value="restart"),
+    ])
+    async def dcbot_cmd(self, interaction: discord.Interaction, action: app_commands.Choice[str]):
+
+        required_role = MISC_ROLES["Server"]  # z. B. ServerAdmin
+        user_roles = [role.name for role in interaction.user.roles]
+
+        if required_role not in user_roles:
+            return await interaction.response.send_message(
+                f"Du benötigst die Rolle **{required_role}**! 🔐",
+                ephemeral=True
+            )
+
+        await interaction.response.defer()
+
+        SYSTEMCTL_CMDS = {
+            "start": "sudo systemctl start discordbot.service",
+            "stop": "sudo systemctl stop discordbot.service",
+            "restart": "sudo systemctl restart discordbot.service",
+        }
+
+        cmd = SYSTEMCTL_CMDS[action.value]
+
+        try:
+            result = subprocess.run(
+                cmd.split(),
+                capture_output=True,
+                text=True
+            )
+
+            output = result.stdout if result.stdout else "Keine Ausgabe"
+            error = result.stderr
+
+            if error:
+                await interaction.followup.send(
+                    f"⚠️ **Fehler:**\n```\n{error}\n```"
+                )
+
+            await interaction.followup.send(
+                f"**Ergebnis:**\n```\n{output}\n```"
+            )
+
+        except Exception as e:
+            await interaction.followup.send(
+                f"❌ Fehler beim Ausführen:\n```\n{e}\n```"
+            )
+
+
 # ======================================================
 # SETUP
 # ======================================================
@@ -162,3 +220,4 @@ async def setup(bot: commands.Bot):
     bot.tree.add_command(cog.server_cmd, guild=bot.guild)
     bot.tree.add_command(cog.docker_cmd, guild=bot.guild)
     bot.tree.add_command(cog.purge_cmd, guild=bot.guild)
+    bot.tree.add_command(cog.dcbot_cmd, guild=bot.guild)
