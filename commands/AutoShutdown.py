@@ -85,13 +85,13 @@ class AutoShutdownCog(commands.Cog):
 
         if action_value == "enable":
             self.enabled = True
-            await interaction.response.send_message("AutoShutdown aktiviert.")
+            await interaction.response.send_message("AutoShutdown aktiviert. 🟩")
             return
 
         if action_value == "disable":
             self.enabled = False
             self._shutdown_deadline = None
-            await interaction.response.send_message("AutoShutdown deaktiviert.")
+            await interaction.response.send_message("AutoShutdown deaktiviert. 🟥")
             return
 
         if action_value == "status":
@@ -99,13 +99,13 @@ class AutoShutdownCog(commands.Cog):
                 await interaction.response.send_message("AutoShutdown deaktiviert.")
                 return
             if self._shutdown_deadline is None:
-                await interaction.response.send_message(f"Aktiv, kein Timer. Timeout: {self.empty_timeout_seconds}s")
+                await interaction.response.send_message(f"Aktiv, kein Timer. Timer Zeit: `{self.empty_timeout_seconds}`s ⏱️")
                 return
             remaining = max(0, int(self._shutdown_deadline - time.time()))
             hours = remaining // 3600
             minutes = (remaining % 3600) // 60
             seconds = remaining % 60
-            await interaction.response.send_message(f"Timer läuft: {hours:02d}:{minutes:02d}:{seconds:02d}")
+            await interaction.response.send_message(f"Timer läuft: `{hours:02d}:{minutes:02d}:{seconds:02d} `⌛")
             return
 
         if action_value == "set":
@@ -137,7 +137,7 @@ class AutoShutdownCog(commands.Cog):
                                 hours = remaining // 3600
                                 minutes = (remaining % 3600) // 60
                                 seconds = remaining % 60
-                                await self._send_channel_message(f"Shutdown-Timer gestartet: {hours:02d}:{minutes:02d}:{seconds:02d} bis Server-Down")
+                                await self._send_channel_message(f"Shutdown-Timer gestartet: `{hours:02d}:{minutes:02d}:{seconds:02d}` bis Server-Shutdown ⌛")
                                 break
                         except:
                             continue
@@ -173,7 +173,7 @@ class AutoShutdownCog(commands.Cog):
                     hours = remaining // 3600
                     minutes = (remaining % 3600) // 60
                     seconds = remaining % 60
-                    await self._send_channel_message(f"Shutdown-Timer gestartet: {hours:02d}:{minutes:02d}:{seconds:02d} bis Server-Down")
+                    await self._send_channel_message(f"Shutdown-Timer gestartet: `{hours:02d}:{minutes:02d}:{seconds:02d}` bis Server-Shutdown")
                 else:
                     if time.time() >= self._shutdown_deadline:
                         self._shutdown_in_progress = True
@@ -181,7 +181,7 @@ class AutoShutdownCog(commands.Cog):
                         self._shutdown_deadline = None
             else:
                 if self._shutdown_deadline is not None:
-                    await self._send_channel_message(f"Shutdown-Timer gestoppt durch Spielerbeigetritt ({player_count} Spieler online)")
+                    await self._send_channel_message(f"Shutdown-Timer gestoppt durch Spielerbeigetritt (`{player_count}` Spieler online)")
                 self._shutdown_deadline = None
 
         self._last_known_player_count = player_count
