@@ -1,54 +1,59 @@
 import discord
 from discord.ext import commands
-from colorama import Back, Fore, Style
-import time
-import json
+from colorama import Fore
 import platform
 import os
+import logging
 from dotenv import load_dotenv
+from config import COMMANDS
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD_ID = int(os.getenv("GUILD_ID"))
 
-
 class Client(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=commands.when_mentioned_or('.'), intents=discord.Intents().all())
-        self.coglist = ["commands.RoleReaction", "commands.AutoShutdown", "commands.fun", "commands.wake","commands.RandomEvents", "commands.whitelist", "commands.misc", "commands.McStats", "commands.infos", "commands.chat_mirror", "commands.backup"]
+        self.coglist = COMMANDS
         self.guild = discord.Object(id=GUILD_ID)
 
     async def setup_hook(self):
-        prfx = (Back.BLACK + Fore.GREEN + time.strftime("%H:%M:%S", time.gmtime()) + Back.RESET + Fore.WHITE + Style.BRIGHT)
-
-        #Clear guild commands first
-        self.tree.clear_commands(guild=self.guild)
-        print(prfx + f" Cleared all guild commands for {Fore.YELLOW}{GUILD_ID}{Fore.WHITE}")
-
-        #Load all cogs (commands are now registered)
-        for ext in self.coglist:
-            await self.load_extension(ext)
-            print(prfx + f" Loaded cog {Fore.YELLOW}{ext}{Fore.WHITE}")
-
-        #Sync guild commands to Discord
-        await self.tree.sync(guild=self.guild)
-        print(prfx + f" Guild commands synced for {Fore.YELLOW}{GUILD_ID}{Fore.WHITE}")
-
-
+        self._clear_guild_commands()
+        await self._load_cogs()
+        await self._sync_guild_commands()
+    
     async def on_ready(self):
-        prfx = (Back.BLACK + Fore.GREEN + time.strftime("%H:%M:%S", time.gmtime()) + Back.RESET + Fore.WHITE + Style.BRIGHT)
-        print(prfx + " Logged in as " + Fore.YELLOW + self.user.name)
-        print(prfx + " Bot ID " + Fore.YELLOW + str(self.user.id))
-        print(prfx + " Discord Version " + Fore.YELLOW + discord.__version__)
-        print(prfx + " Python Version " + Fore.YELLOW + str(platform.python_version()))
-        #synced = await self.tree.sync()
+        prfx = self._retrieveTimestampWithStyles()
+        _log_bot_info()
+
         commands_list = self.tree.get_commands(guild=self.guild)
         print(prfx + f"Registered guild commands: {[cmd.name for cmd in commands_list]}")
 
+    async def _sync_guild_commands(self):
+        await self.tree.sync(guild=self.guild)
+        logger.info(f"Guild commands synced for {Fore.YELLOW}{GUILD_ID}{Fore.WHITE}")
 
-        
+    def _clear_guild_commands(self):
+        self.tree.clear_commands(guild=self.guild)
+        logger.info(f"Cleared all guild commands for {Fore.YELLOW}{GUILD_ID}{Fore.WHITE}")
+
+    async def _load_cogs(self):
+        for ext in self.coglist:
+            await self.load_extension(ext)
+            logger.info(f"Loaded cog {Fore.YELLOW}{ext}{Fore.WHITE}")
+
+def _log_bot_info(client: Client):
+    logger.info(f"Logged in as {client.user.name}")
+    logger.info(f"Bot ID: {client.user.id}")
+    logger.info(f"Discord Version: {discord.__version__}")
+    logger.info(f"Python Version: {platform.python_version()}")
 
 client = Client()
-
 client.run(TOKEN)
